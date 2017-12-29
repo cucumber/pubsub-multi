@@ -1,0 +1,19 @@
+{
+  "name": "pubsub-multi",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "eventsource": "^1.0.5",
+    "mocha": "^4.0.1",
+    "node-fetch": "^1.7.3"
+  },
+  "dependencies": {
+    "express": "^4.16.2",
+    "ssestream": "^1.0.1",
+    "uuid": "^3.1.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  }
+}
