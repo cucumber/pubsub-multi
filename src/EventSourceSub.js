@@ -1,10 +1,10 @@
 const PubSub = require('./PubSub')
 
 module.exports = class EventSourceSub {
-  constructor({ httpJsonClient, eventSource }) {
-    if (!httpJsonClient) throw new Error("No httpJsonClient")
+  constructor({ fetch22, eventSource }) {
+    if (!fetch22) throw new Error("No fetch22")
     if (!eventSource) throw new Error("No eventSource")
-    this._httpJsonClient = httpJsonClient
+    this._fetch22 = fetch22
     this._pubSub = new PubSub(true)
     this._subscriptions = []
 
@@ -44,7 +44,7 @@ module.exports = class EventSourceSub {
   async _postSubscription(signal) {
     if (!this._connectionId) throw new Error(`Shouldn't post subscription when disconnected`)
     const path = `/pubsub/${encodeURIComponent(this._connectionId)}`
-    await this._httpJsonClient.post(path, signal)
+    await this._fetch22.post(path, signal)
   }
 }
 

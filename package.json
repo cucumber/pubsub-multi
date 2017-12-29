@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "express": "^4.16.2",
+    "express-extensions": "cucumber-ltd/express-extensions",
+    "fetch-22": "cucumber-ltd/fetch-22",
     "ssestream": "^1.0.1",
     "uuid": "^3.1.0"
   },
