@@ -28,7 +28,7 @@ await pub.publish('some-signal')
 
 ## HTTP
 
-To use this over HTTP, you would mount the express middleware in your express app:
+To use this over HTTP, mount the express middleware in your express app:
 
 ```javascript
 const express = require('express')
@@ -48,14 +48,16 @@ app.use(subRouter({ sub }))
 To publish, you would use `pub.publish` as described above. The `subRouter` then sends signals to subscribers
 using Server-Sent Events as the transport.
 
-Clients would create asubscribe as follows:
+Clients subscribe as follows:
 
 ```javascript
-const HttpJsonClient = require('http-json-client') // Tiny lib that simplifies HTTP
+const { EventSourceSub } = require('pubsub-multi')
+const Fetch22 = require('fetch-22') // Tiny lib that simplifies HTTP
 const fetch = window.fetch.bind(window)
-const httpJsonClient = new HttpJsonClient({ baseUrl, fetch })
+const fetch22 = new Fetch22({ baseUrl, fetch })
 const eventSource = new EventSource(`${baseUrl}/pubsub`)
-const sub = new EventSourceSub({ httpJsonClient, eventSource })
+
+const sub = new EventSourceSub({ fetch22, eventSource })
 ```
 
 To subscribe, you would use `sub.subscribe` as described above. The `EventSourceSub` registers subscriptions on the server
