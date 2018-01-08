@@ -17,12 +17,13 @@ module.exports = class NotificationTrace {
     })
   }
 
-  async containsSignal(signal) {
-    if (this._trace.indexOf(signal) !== -1) return Promise.resolve()
+  async containsSignal(signal, count=1) {
+    const traceCount = this._trace.reduce((total, sig) => sig === signal ? total + 1 : total, 0)
+    if (traceCount === count) return Promise.resolve()
 
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(
-        () => reject(new Error(`Timed out waiting for "${signal}" for ${this._timeout} ms. Signal trace: ${JSON.stringify(this._trace)}`)),
+        () => reject(new Error(`Timed out waiting for ${count} "${signal}" for ${this._timeout} ms. Signal trace: ${JSON.stringify(this._trace)}`)),
         this._timeout
       )
 
@@ -30,8 +31,11 @@ module.exports = class NotificationTrace {
         this._resolversBySignal.set(signal, [])
       }
       const resolver = () => {
-        clearTimeout(timeout)
-        resolve()
+        const traceCount = this._trace.reduce((total, sig) => sig === signal ? total + 1 : total, 0)
+        if (traceCount === count) {
+          clearTimeout(timeout)
+          resolve()
+        }
       }
       this._resolversBySignal.get(signal).push(resolver)
     })
