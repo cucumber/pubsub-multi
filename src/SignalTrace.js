@@ -1,14 +1,14 @@
 module.exports = class NotificationTrace {
-  constructor(sub, timeout = 100) {
-    if (!sub) throw new Error('No sub')
-    this._sub = sub
+  constructor(subscriber, timeout = 100) {
+    if (!subscriber) throw new Error('No subscriber')
+    this._subscriber = subscriber
     this._timeout = timeout
     this._trace = []
     this._resolversBySignal = new Map()
   }
 
   async start() {
-    await this._sub.subscribe(null, async signal => {
+    await this._subscriber.subscribe(null, async signal => {
       this._trace.push(signal)
       const resolvers = this._resolversBySignal.get(signal) || []
       for (const resolver of resolvers) {

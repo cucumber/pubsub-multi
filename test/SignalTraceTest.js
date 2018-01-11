@@ -1,13 +1,18 @@
 const assert = require('assert')
 const SignalTrace = require('../src/SignalTrace')
-const PubSub = require('../src/PubSub')
+const MemoryPublisher = require('../src/MemoryPublisher')
 
 describe('SignalTrace', () => {
+  let publisher, subscriber
+  beforeEach(() => {
+    publisher = new MemoryPublisher()
+    subscriber = publisher.makeSubscriber()
+  })
+  
   it('throws when not enough signals are published', async () => {
-    const pubSub = new PubSub(true)
-    const trace = new SignalTrace(pubSub, 1)
+    const trace = new SignalTrace(subscriber, 1)
     await trace.start()
-    await pubSub.publish('WANTED')
+    await publisher.publish('WANTED')
 
     try {
       await trace.containsSignal('WANTED', 2)
@@ -18,21 +23,19 @@ describe('SignalTrace', () => {
   })
 
   it('contains previously published signal', async () => {
-    const pubSub = new PubSub(true)
-    const trace = new SignalTrace(pubSub)
+    const trace = new SignalTrace(subscriber)
     await trace.start()
 
-    await pubSub.publish('WANTED')
-    await pubSub.publish('WANTED')
+    await publisher.publish('WANTED')
+    await publisher.publish('WANTED')
     await trace.containsSignal('WANTED', 2)
   })
 
   it('throws when not enough signals are published async', async () => {
-    const pubSub = new PubSub()
-    const trace = new SignalTrace(pubSub, 1)
+    const trace = new SignalTrace(subscriber, 1)
     await trace.start()
 
-    process.nextTick(() => pubSub.publish('WANTED').catch(err => {
+    process.nextTick(() => publisher.publish('WANTED').catch(err => {
       throw err
     }))
     try {
@@ -44,12 +47,11 @@ describe('SignalTrace', () => {
   })
 
   it('waits for signal to be published', async () => {
-    const pubSub = new PubSub()
-    const trace = new SignalTrace(pubSub)
+    const trace = new SignalTrace(subscriber)
     await trace.start()
-    await pubSub.publish('WANTED')
+    await publisher.publish('WANTED')
 
-    process.nextTick(() => pubSub.publish('WANTED').catch(err => {
+    process.nextTick(() => publisher.publish('WANTED').catch(err => {
       throw err
     }))
     await trace.containsSignal('WANTED', 2)

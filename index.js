@@ -1,6 +1,6 @@
 module.exports = {
-  PubSub: require('./src/PubSub'),
-  EventSourceSub: require('./src/EventSourceSub'),
-  subRouter: require('./src/subRouter'),
+  MemoryPublisher: require('./src/MemoryPublisher'),
+  EventSourcePublisher: require('./src/EventSourcePublisher'),
+  pubSubRouter: require('./src/pubSubRouter'),
   SignalTrace: require('./src/SignalTrace')
 }
