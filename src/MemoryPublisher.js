@@ -11,9 +11,9 @@ module.exports = class PubSub {
 
   /**
    */
-  async publish(signal) {
+  async publish(signal, ...args) {
     for(const subscriber of this._subscriberById.values()) {
-      await subscriber.publish(signal)
+      await subscriber.publish(signal, ...args)
     }
   }
   
@@ -85,14 +85,14 @@ class Subscriber {
     })
   }
 
-  async publish(signal) {
+  async publish(signal, ...args) {
     const subscription = this._subscriptionBySignal.get(signal)
     if (subscription) {
-      await subscription.deliver(signal)
+      await subscription.deliver(signal, ...args)
     }
     const wildcardSubscription = this._subscriptionBySignal.get(null)
     if (wildcardSubscription) {
-      await wildcardSubscription.deliver(signal)
+      await wildcardSubscription.deliver(signal, ...args)
     }
   }
 }
@@ -107,7 +107,7 @@ class Subscription {
     return this._signal
   }
 
-  async deliver(signal) {
-    await this._signalFunction(signal)
+  async deliver(signal, ...args) {
+    await this._signalFunction(signal, ...args)
   }
 }

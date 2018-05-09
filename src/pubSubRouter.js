@@ -57,13 +57,14 @@ class Connection {
       this._subscriberById.set(subscriberId, subscriber)
     }
     const subscriber = this._subscriberById.get(subscriberId)
-    await subscriber.subscribe(subscribedSignal, async signal => {
+    await subscriber.subscribe(subscribedSignal, async (signal, ...args) => {
       this._sse.write({
         event: 'pubsub-signal',
         data: JSON.stringify({
           subscriberId,
           subscribedSignal,
-          signal
+          signal,
+          args
         })
       })
     })

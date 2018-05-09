@@ -14,10 +14,10 @@ module.exports = class EventSourceSub {
     }
 
     eventSource.addEventListener('pubsub-signal', e => {
-      const { subscriberId, subscribedSignal, signal } = JSON.parse(e.data)
+      const { subscriberId, subscribedSignal, signal, args } = JSON.parse(e.data)
       const subscriber = this._subscriberById.get(subscriberId)
       if(!subscriber) throw new Error(`Unknown subscriber ${subscriberId}`)
-      subscriber.publish(signal)
+      subscriber.publish(signal, ...args)
         .catch(err => console.error('Signalling failed', err))
     })
 
@@ -31,7 +31,7 @@ module.exports = class EventSourceSub {
   }
 
   makeSubscriber(id = uuid()) {
-    const subscriber = new Subscriber(this._pubSub.makeSubscriber(id), this)
+    const subscriber = new PostSubscriber(this._pubSub.makeSubscriber(id), this)
     this._subscriberById.set(id, subscriber)
     return subscriber
   }
@@ -51,7 +51,7 @@ module.exports = class EventSourceSub {
   }
 }
 
-class Subscriber {
+class PostSubscriber {
   constructor(subscriber, transport) {
     this._subscriber = subscriber
     this._transport = transport
@@ -66,8 +66,8 @@ class Subscriber {
     await this._transport._postSubscription(this.id, signal)
   }
 
-  async publish(signal) {
-    return this._subscriber.publish(signal)
+  async publish(signal, ...args) {
+    return this._subscriber.publish(signal, ...args)
   }
 
   async _postSubscriptions() {
