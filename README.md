@@ -20,7 +20,7 @@ await publisher.publish('some-signal')
 The API for publishing too:
 
 ```javascript
-// publisher is an instance of MemoryPublisher or EventSourcePublisher
+// publisher is an instance of MemoryPublisher or EventSourcePubSub
 const subscriber = publisher.makeSubscriber()
 await subscriber.subscribe('some-signal', async () => {
   console.log('received some-signal')
@@ -50,17 +50,17 @@ subscribers using Server-Sent Events as the transport.
 Clients are configured as follows:
 
 ```javascript
-const { EventSourcePublisher } = require('pubsub-multi')
+const { EventSourcePubSub } = require('pubsub-multi')
 const Fetch22 = require('fetch-22') // Tiny lib that simplifies HTTP
 const fetch = window.fetch.bind(window)
 const baseUrl = ''
 const fetch22 = new Fetch22({ baseUrl, fetch })
 const eventSource = new EventSource(`${baseUrl}/pubsub`)
 
-const publisher = new EventSourcePublisher({ fetch22, eventSource })
+const publisher = new EventSourcePubSub({ fetch22, eventSource })
 const subscriber = publisher.makeSubscriber()
 ```
 
 To subscribe, you would use `subscriber.subscribe` as described above.
-The `EventSourcePublisher` registers subscriptions on the server
+The `EventSourcePubSub` registers subscriptions on the server
 with HTTP POST.

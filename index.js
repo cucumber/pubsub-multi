@@ -1,6 +1,6 @@
 module.exports = {
-  MemoryPublisher: require('./src/MemoryPublisher'),
-  EventSourcePublisher: require('./src/EventSourcePublisher'),
+  MemoryPublisher: require('./src/MemoryPubSub'),
+  EventSourcePublisher: require('./src/EventSourcePubSub'),
   pubSubRouter: require('./src/pubSubRouter'),
   SignalTrace: require('./src/SignalTrace')
 }
