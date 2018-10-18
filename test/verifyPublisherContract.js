@@ -15,7 +15,7 @@ module.exports = function verifyContract(makePubSub) {
       subscriber.stop()
     })
 
-    it('publishes a signal once to each subscription', async () => {
+    it('publishes a signal once to each subscriber', async () => {
       return new Promise(resolve => {
         subscriber.subscribe('something', async (a, b) => {
           assert.equal(a, 'a')

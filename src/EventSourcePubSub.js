@@ -1,7 +1,7 @@
 const MemoryPubSub = require('./MemoryPubSub')
 
 module.exports = class EventSourcePubSub {
-  constructor({ fetch22, EventSource, eventSourceUrl }) {
+  constructor({fetch22, EventSource, eventSourceUrl}) {
     if (!fetch22) throw new Error("No fetch22")
     if (!EventSource) throw new Error("No EventSource")
     if (!eventSourceUrl) throw new Error("No eventSourceUrl")
@@ -39,14 +39,12 @@ class EventSourceSubscriber {
       }
 
       eventSource.addEventListener('pubsub-signal', e => {
-        console.log('pubsub-signal', JSON.parse(e.data))
-        const { subscriptionId, signal, args } = JSON.parse(e.data)
+        const {signal, args} = JSON.parse(e.data)
         this._pubSub.publish(signal, ...args)
           .catch(err => console.error('Signalling failed', err))
       })
 
       eventSource.addEventListener('pubsub-connectionId', e => {
-        console.log('pubsub-connectionId', e.data)
         this._connectionId = e.data
         resolve()
       })
@@ -58,7 +56,7 @@ class EventSourceSubscriber {
   }
 
   async subscribe(signal, signalFunction) {
-    if(!this._subscriber) {
+    if (!this._subscriber) {
       this._subscriber = await this._pubSub.makeSubscriber()
     }
     await this._subscriber.subscribe(signal, signalFunction)
@@ -67,11 +65,11 @@ class EventSourceSubscriber {
 
   async _postSubscription(signal) {
     if (!this._connectionId) {
+      // TODO: Throw error instead?
       return
     }
+    // TODO: Make path configurable
     const path = `/pubsub/${encodeURIComponent(this._connectionId)}/${encodeURIComponent(signal)}`
-    console.log('POST', path)
     await this._fetch22.post(path)
-    console.log('POST OK')
   }
 }

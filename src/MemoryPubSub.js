@@ -31,7 +31,7 @@ class Subscriber {
   async stop() {}
 
   async _publish(signal, ...args) {
-    const signalFunctions = this._signalFunctionsBySignal.get(signal)
+    const signalFunctions = this._signalFunctionsBySignal.get(signal) || []
     for (const signalFunction of signalFunctions) {
       await signalFunction(...args)
     }

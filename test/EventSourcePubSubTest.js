@@ -8,6 +8,8 @@ const EventSourcePubSub = require('../src/EventSourcePubSub')
 const pubSubRouter = require('../src/pubSubRouter')
 const verifyPublisherContract = require('./verifyPublisherContract')
 
+const PUBSUB_ROUTE = '/pubsub'
+
 describe('EventSourcePubSub', () => {
   let webServer, port
 
@@ -17,12 +19,12 @@ describe('EventSourcePubSub', () => {
     const app = express()
     app.use(bodyParser.json())
     app.use(bodyParser.text())
-    app.use(pubSubRouter(pubSub))
+    app.use(pubSubRouter(pubSub, PUBSUB_ROUTE))
     webServer = new WebServer(app)
     port = await webServer.listen(0)
     const baseUrl = `http://localhost:${port}`
     const fetch22 = new Fetch22({baseUrl, fetch})
-    const eventSourceUrl = `${baseUrl}/pubsub`;
+    const eventSourceUrl = `${baseUrl}${PUBSUB_ROUTE}`;
     return new EventSourcePubSub({fetch22, EventSource, eventSourceUrl})
   }
 

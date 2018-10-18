@@ -5,9 +5,6 @@ Multiple implementations of Publish-Subscribe.
 * In-memory
 * HTTP EventSource and POST as transport
 
-The library also ships with a `SignalTrace` utility which is useful for testing asynchronous code. This is inspired from
-the [GOOS Book](http://www.growing-object-oriented-software.com/)'s `NotificationTrace`.
-
 Both implementations share the same contract tests, allowing them to be used interchangeably.
 
 The API for publishing is simple:
@@ -53,7 +50,7 @@ Clients are configured as follows:
 const { EventSourcePubSub } = require('pubsub-multi')
 const Fetch22 = require('fetch-22') // Tiny lib that simplifies HTTP
 const fetch = window.fetch.bind(window)
-const baseUrl = ''
+const baseUrl = 'http://host.com'
 const fetch22 = new Fetch22({ baseUrl, fetch })
 const eventSource = new EventSource(`${baseUrl}/pubsub`)
 
