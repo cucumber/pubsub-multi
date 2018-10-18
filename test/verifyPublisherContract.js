@@ -6,7 +6,7 @@ module.exports = function verifyContract(makePubSub) {
   describe('Publisher contract', () => {
     let pubSub, subscriber
     beforeEach(async () => {
-      pubSub = new MemoryPubSub()
+      pubSub = new MemoryPubSub({_version: async () => 99})
       const pubSub2 = await makePubSub(pubSub)
       subscriber = await pubSub2.makeSubscriber(uuid())
     })
@@ -23,6 +23,15 @@ module.exports = function verifyContract(makePubSub) {
           resolve()
         })
           .then(() => pubSub.publish('something', 'a', 'b'))
+      })
+    })
+
+    it('publishes a version number when a subscriber subscribes', async () => {
+      return new Promise(resolve => {
+        subscriber.subscribe('_version', async (version) => {
+          assert.equal(version, 99)
+          resolve()
+        })
       })
     })
   })

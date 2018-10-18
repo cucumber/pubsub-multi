@@ -1,10 +1,11 @@
 module.exports = class MemoryPubSub {
-  constructor() {
+  constructor(immediates = {}) {
     this._subscribers = []
+    this._immediates = immediates
   }
 
   async makeSubscriber() {
-    const subscriber = new Subscriber()
+    const subscriber = new Subscriber(this._immediates)
     this._subscribers.push(subscriber)
     return subscriber
   }
@@ -17,8 +18,9 @@ module.exports = class MemoryPubSub {
 }
 
 class Subscriber {
-  constructor() {
+  constructor(immediates) {
     this._signalFunctionsBySignal = new Map()
+    this._immediates = immediates
   }
 
   async subscribe(signal, signalFunction) {
@@ -26,9 +28,16 @@ class Subscriber {
       this._signalFunctionsBySignal.set(signal, [])
     }
     this._signalFunctionsBySignal.get(signal).push(signalFunction)
+
+    const immediate = this._immediates[signal]
+    if (immediate) {
+      const value = (typeof immediate === 'function') ? await immediate() : immediate
+      await this._publish(signal, value)
+    }
   }
 
-  async stop() {}
+  async stop() {
+  }
 
   async _publish(signal, ...args) {
     const signalFunctions = this._signalFunctionsBySignal.get(signal) || []
