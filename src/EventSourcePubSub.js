@@ -7,8 +7,8 @@ module.exports = class EventSourcePubSub {
     if (!EventSource) throw new Error("No EventSource")
     if (!baseUrl) throw new Error("No baseUrl")
 
-    this._EventSource = EventSource;
-    this._baseUrl = baseUrl;
+    this._EventSource = EventSource
+    this._baseUrl = baseUrl = (typeof baseUrl === 'function') ? baseUrl() : baseUrl
     this._fetch22 = new Fetch22({baseUrl, fetch})
 
     this._subscribers = []
