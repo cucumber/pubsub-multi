@@ -1,21 +1,22 @@
 const MemoryPubSub = require('./MemoryPubSub')
+const Fetch22 = require('fetch-22')
 
 module.exports = class EventSourcePubSub {
-  constructor({fetch22, EventSource, eventSourceUrl}) {
-    if (!fetch22) throw new Error("No fetch22")
+  constructor(fetch, EventSource, baseUrl) {
+    if (!fetch) throw new Error("No fetch")
     if (!EventSource) throw new Error("No EventSource")
-    if (!eventSourceUrl) throw new Error("No eventSourceUrl")
+    if (!baseUrl) throw new Error("No baseUrl")
 
-    this._fetch22 = fetch22
     this._EventSource = EventSource;
-    this._eventSourceUrl = eventSourceUrl;
+    this._baseUrl = baseUrl;
+    this._fetch22 = new Fetch22({baseUrl, fetch})
 
     this._subscribers = []
   }
 
   async makeSubscriber() {
     const subscriber = new EventSourceSubscriber(this._fetch22)
-    const eventSource = new this._EventSource(this._eventSourceUrl)
+    const eventSource = new this._EventSource(this._baseUrl)
     await subscriber.connect(eventSource)
     this._subscribers.push(subscriber)
     return subscriber
@@ -35,7 +36,7 @@ class EventSourceSubscriber {
     return new Promise((resolve, reject) => {
       eventSource.onerror = e => {
         this._connectionId = null
-        reject(new Error('EventSource error: ' + e))
+        reject(new Error(`EventSource error: ${e.message} - ${eventSource.url}`))
       }
 
       eventSource.addEventListener('pubsub-signal', e => {
@@ -68,8 +69,7 @@ class EventSourceSubscriber {
       // TODO: Throw error instead?
       return
     }
-    // TODO: Make path configurable
-    const path = `/pubsub/${encodeURIComponent(this._connectionId)}/${encodeURIComponent(signal)}`
+    const path = `/${encodeURIComponent(this._connectionId)}/${encodeURIComponent(signal)}`
     await this._fetch22.post(path)
   }
 }

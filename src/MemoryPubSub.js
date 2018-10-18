@@ -36,6 +36,8 @@ class Subscriber {
     }
   }
 
+  // TODO: Add unsubscribe
+
   async stop() {
   }
 

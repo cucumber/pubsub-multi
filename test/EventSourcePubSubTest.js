@@ -2,13 +2,12 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const fetch = require('node-fetch')
 const EventSource = require('eventsource')
-const Fetch22 = require('fetch-22')
 const {WebServer} = require('express-extensions')
 const EventSourcePubSub = require('../src/EventSourcePubSub')
 const pubSubRouter = require('../src/pubSubRouter')
 const verifyPublisherContract = require('./verifyPublisherContract')
 
-const PUBSUB_ROUTE = '/pubsub'
+const BASEPATH = '/blablabl'
 
 describe('EventSourcePubSub', () => {
   let webServer, port
@@ -19,13 +18,11 @@ describe('EventSourcePubSub', () => {
     const app = express()
     app.use(bodyParser.json())
     app.use(bodyParser.text())
-    app.use(pubSubRouter(pubSub, PUBSUB_ROUTE))
+    app.use(pubSubRouter(pubSub, BASEPATH))
     webServer = new WebServer(app)
     port = await webServer.listen(0)
-    const baseUrl = `http://localhost:${port}`
-    const fetch22 = new Fetch22({baseUrl, fetch})
-    const eventSourceUrl = `${baseUrl}${PUBSUB_ROUTE}`;
-    return new EventSourcePubSub({fetch22, EventSource, eventSourceUrl})
+    const baseUrl = `http://localhost:${port}${BASEPATH}`
+    return new EventSourcePubSub(fetch, EventSource, baseUrl)
   }
 
   afterEach(async () => {

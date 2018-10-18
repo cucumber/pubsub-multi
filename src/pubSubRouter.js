@@ -2,12 +2,12 @@ const SseStream = require('ssestream')
 const uuid = require('uuid/v4')
 const { asyncRouter } = require('express-extensions')
 
-module.exports = (pubSub, pubSubRoute) => {
+module.exports = (pubSub, basePath) => {
   if (!pubSub) throw new Error('No publisher')
   const router = asyncRouter()
   const connectionByConnectionId = new Map()
 
-  router.$get(pubSubRoute, async (req, res) => {
+  router.$get(basePath, async (req, res) => {
     const sse = new SseStream(req)
     sse.pipe(res)
     req.on('close', () => {
@@ -23,7 +23,7 @@ module.exports = (pubSub, pubSubRoute) => {
     connection.sendConnectionId()
   })
 
-  router.$post(`${pubSubRoute}/:connectionId/:signal`, async (req, res) => {
+  router.$post(`${basePath}/:connectionId/:signal`, async (req, res) => {
     const { connectionId, signal } = req.params
 
     const connection = connectionByConnectionId.get(connectionId)
