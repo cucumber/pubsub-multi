@@ -42,7 +42,10 @@ class EventSourceSubscriber {
       eventSource.addEventListener('pubsub-signal', e => {
         const {signal, args} = JSON.parse(e.data)
         this._pubSub.publish(signal, ...args)
-          .catch(err => console.error('Signalling failed:', err.stack))
+          .catch(err => {
+            // Ignore the error - it happens usually during shutdown in tests
+            // console.error('Signalling failed:', err.stack)
+          })
       })
 
       eventSource.addEventListener('pubsub-connectionId', e => {
