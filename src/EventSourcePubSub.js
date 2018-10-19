@@ -8,7 +8,7 @@ module.exports = class EventSourcePubSub {
     if (!baseUrl) throw new Error("No baseUrl")
 
     this._EventSource = EventSource
-    this._baseUrl = baseUrl = (typeof baseUrl === 'function') ? baseUrl() : baseUrl
+    this._baseUrlFn = (typeof baseUrl === 'function') ? baseUrl : () => baseUrl
     this._fetch22 = new Fetch22({baseUrl, fetch})
 
     this._subscribers = []
@@ -16,7 +16,7 @@ module.exports = class EventSourcePubSub {
 
   async makeSubscriber() {
     const subscriber = new EventSourceSubscriber(this._fetch22)
-    const eventSource = new this._EventSource(this._baseUrl)
+    const eventSource = new this._EventSource(this._baseUrlFn())
     await subscriber.connect(eventSource)
     this._subscribers.push(subscriber)
     return subscriber
@@ -42,7 +42,7 @@ class EventSourceSubscriber {
       eventSource.addEventListener('pubsub-signal', e => {
         const {signal, args} = JSON.parse(e.data)
         this._pubSub.publish(signal, ...args)
-          .catch(err => console.error('Signalling failed', err))
+          .catch(err => console.error('Signalling failed:', err.stack))
       })
 
       eventSource.addEventListener('pubsub-connectionId', e => {
